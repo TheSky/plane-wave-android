@@ -79,6 +79,12 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
             }
         });
 
+        planeWaveThread2 = new PlaneWaveThread(holder, context, new Handler() {
+            @Override
+            public void handleMessage(Message m) {
+            }
+        });
+
         /*  planeWaveThread2 = new PlaneWaveThread(holder, context, new Handler() {
             @Override
             public void handleMessage(Message m) {
@@ -106,6 +112,7 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
         private boolean mRun = false;
 
         private Wave wave;
+        private int length = 12;
 
         public void init_params(int width, int height, int angle) {
             this.width = width;
@@ -143,11 +150,13 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
                     synchronized (mSurfaceHolder) {
                         try {
                             doDraw(c);
-                            Thread.currentThread().sleep(10);
+                            Thread.currentThread().sleep(5);
+
                             wave.randomize_params();
                             wave.propagate();
                             image_overlay = Bitmap.createBitmap(image_background);
                             wave.stretch(image_background, image_overlay);
+                            wave.setLength(length);
                         } catch (Exception e) {
                         }
                     }
@@ -185,20 +194,25 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
         /**
          * Pauses the physics update & animation.
          */
-        public void pause() {
-            synchronized (mSurfaceHolder) {
-                // if (mMode == STATE_RUNNING) setState(STATE_PAUSE);
-            }
-        }
 
         public void setRunning(boolean b) {
             mRun = b;
         }
+
+
+        public void setWaveLength(int length) {
+            this.length = length;
+        }
+
     }
 
 
     public PlaneWaveThread getPlaneWaveThread() {
         return planeWaveThread;
+    }
+
+    public PlaneWaveThread getPlaneWaveThread2() {
+        return planeWaveThread2;
     }
 
     public void setTextView(TextView textView) {

@@ -7,8 +7,9 @@ import java.util.Random;
 public class Wave {
 
     //wave parameters
-    private int length = 20;
-    private int speed = 90;
+    private int length = 12;   // short wave by default
+    private int length_new = 12;
+    private int speed = 20;
     private int angle = 45;
     private double variance = 380;
     private int multiplication_factor = 10000;
@@ -99,7 +100,7 @@ public class Wave {
         findElevations();
     }
 
-    public synchronized void stretch(Bitmap image_original, Bitmap image_to_draw) {
+    public void stretch(Bitmap image_original, Bitmap image_to_draw) {
 
         double displacement;
 
@@ -148,6 +149,7 @@ public class Wave {
                             break;
                         }
                     }
+
                 }
             }
 
@@ -171,10 +173,9 @@ public class Wave {
                             break;
                         }
                     }
+
                 }
             }
-
-
         }
 
         //selection of proper algorithm depending on wave`s crest inclination angle
@@ -187,6 +188,10 @@ public class Wave {
             new WaveDeformationProcessor().horizontal_process(image_original, image_to_draw);
         }
 
+        length = length_new;
     }
 
+    public void setLength(int length) {
+        this.length_new = length;
+    }
 }

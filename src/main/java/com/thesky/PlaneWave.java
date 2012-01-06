@@ -15,6 +15,11 @@ public class PlaneWave extends Activity {
     private PlaneWaveView mPlaneWaveView;
     private PlaneWaveThread mPlaneWaveThread;
 
+    private static final int MENU_SMALL_WAVE = 1;
+    private static final int MENU_LARGE_WAVE = 2;
+    private static final int MENU_ONE_WAVE = 3;
+    private static final int MENU_TWO_WAVES = 4;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,47 +45,48 @@ public class PlaneWave extends Activity {
 
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();    //To change body of overridden methods use File | Settings | File Templates.
-    }
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-
         switch (item.getItemId()) {
-
             case MENU_ONE_WAVE: {
+                //   mPlaneWaveView.setSecondWaveActive(false);
+                try {
+                    mPlaneWaveView.getPlaneWaveThread2().interrupt();
+                } catch (Exception e) {
 
+                }
+                return true;
             }
-
             case MENU_TWO_WAVES: {
+                //  mPlaneWaveView.setSecondWaveActive(true);
+                try {
+                    mPlaneWaveView.getPlaneWaveThread2().init_params(mPlaneWaveView.getWidth(), mPlaneWaveView.getHeight(), 150);
+                    mPlaneWaveView.getPlaneWaveThread2().setRunning(true);
+                    mPlaneWaveView.getPlaneWaveThread2().start();
 
+                } catch (Exception e) {
+
+                }
+                return true;
             }
-
             case MENU_SMALL_WAVE: {
+                mPlaneWaveView.getPlaneWaveThread().setWaveLength(12);
 
+                if (mPlaneWaveView.getPlaneWaveThread2() != null) {
+                    mPlaneWaveView.getPlaneWaveThread2().setWaveLength(12);
+                }
+                return true;
             }
-
             case MENU_LARGE_WAVE: {
-
+                mPlaneWaveView.getPlaneWaveThread().setWaveLength(40);
+                if (mPlaneWaveView.getPlaneWaveThread2() != null) {
+                    mPlaneWaveView.getPlaneWaveThread2().setWaveLength(40);
+                }
+                return true;
             }
-
-
         }
-
         return false;
     }
-
-
-    private static final int MENU_SMALL_WAVE = 1;
-    private static final int MENU_LARGE_WAVE = 2;
-    private static final int MENU_ONE_WAVE = 3;
-    private static final int MENU_TWO_WAVES = 4;
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
