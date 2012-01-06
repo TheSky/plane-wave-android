@@ -96,6 +96,8 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
 
         private Wave wave;
         private int length = 12;
+        private int variance = 300;
+        private int speed = 20;
 
         public void init_params(int width, int height, int angle) {
             wave = new Wave(height, width, angle);
@@ -129,7 +131,10 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
                             wave.propagate();
                             image_overlay = Bitmap.createBitmap(image_background);
                             wave.stretch(image_background, image_overlay);
+
                             wave.setLength(length);
+                            wave.setVariance(variance);
+                            wave.setSpeed(speed);
                             long end_time = System.currentTimeMillis();
 
                             currentPerformanceFactor = end_time - start_time;
@@ -160,9 +165,19 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
             this.length = length;
         }
 
+        public void setVariance(int variance) {
+            this.variance = variance;
+        }
+
+        public void setSpeed(int speed) {
+            this.speed = speed;
+        }
+
         public synchronized long getCurrentPerformanceFactor() {
             return currentPerformanceFactor;
         }
+
+
     }
 
     public class PerformanceAnalyzer extends Thread {

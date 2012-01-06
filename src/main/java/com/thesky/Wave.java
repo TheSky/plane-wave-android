@@ -7,11 +7,11 @@ import java.util.Random;
 class Wave {
 
     //wave parameters
-    private int length = 12;   // short wave by default
-    private int length_new = 12;
-    private int speed = 80;
+    private int length = 24;
+    private int length_new = 24;
+    private int speed = 40;
     private int angle = 45;
-    private double variance = 380;
+    private double variance = 260;
     private int multiplication_factor = 10000;
 
     private int x = 0;
@@ -191,5 +191,13 @@ class Wave {
 
     public void setLength(int length) {
         this.length_new = length;
+    }
+
+    public void setVariance(int variance) {
+        this.variance = variance;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 }

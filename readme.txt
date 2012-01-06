@@ -1,0 +1,1 @@
+complete implementation of "Plane Wave" effect over bitmap in Android

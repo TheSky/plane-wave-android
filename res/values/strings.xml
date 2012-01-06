@@ -8,4 +8,10 @@
     <string name="menu_smallwave">Small Waves</string>
     <string name="menu_largewave">Large Waves</string>
 
+    <string name="menu_lowdist">Low Distortion</string>
+    <string name="menu_highdist">High Distortion</string>
+
+    <string name="menu_lowspeed">Low Speed</string>
+    <string name="menu_highspeed">High Speed</string>
+
 </resources>

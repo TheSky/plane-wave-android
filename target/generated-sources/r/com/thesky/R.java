@@ -28,7 +28,11 @@ public final class R {
 
     public static final class string {
         public static final int app_name = 0x7f040000;
+        public static final int menu_highdist = 0x7f040006;
+        public static final int menu_highspeed = 0x7f040008;
         public static final int menu_largewave = 0x7f040004;
+        public static final int menu_lowdist = 0x7f040005;
+        public static final int menu_lowspeed = 0x7f040007;
         public static final int menu_onewave = 0x7f040001;
         public static final int menu_smallwave = 0x7f040003;
         public static final int menu_twowaves = 0x7f040002;
