@@ -8,7 +8,7 @@ public class Wave {
 
     //wave parameters
     private int length = 20;
-    private int speed = 20;
+    private int speed = 90;
     private int angle = 45;
     private double variance = 380;
     private int multiplication_factor = 10000;

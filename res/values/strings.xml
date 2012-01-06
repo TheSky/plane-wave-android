@@ -2,10 +2,10 @@
 <resources>
     <string name="app_name">Plane Wave</string>
 
-    <string name="menu_onewave">One Wave</string>
-    <string name="menu_twowaves">Two Waves</string>
+    <string name="menu_onewave">One Wave\n(Serial Algorithm)</string>
+    <string name="menu_twowaves">Two Waves\n(Parallel Algorithm)</string>
 
-    <string name="menu_pause">Pause</string>
-    <string name="menu_resume">Resume</string>
+    <string name="menu_smallwave">Small Wave Size</string>
+    <string name="menu_largewave">Large Wave Size</string>
 
 </resources>
