@@ -1,10 +1,10 @@
 package com.thesky;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -14,40 +14,33 @@ import android.widget.TextView;
 
 public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private PlaneWaveThread planeWaveThread;
-    private PlaneWaveThread planeWaveThread2;
-    private volatile Context mContext;
-    private volatile TextView mStatusText;
+    private final PlaneWaveThread planeWaveThread;
+    private final PlaneWaveThread planeWaveThread2;
+    private Context mContext;
+    private TextView mStatusText1;
+    private TextView mStatusText2;
 
-    private boolean secondWaveActive = false;
+    private final PerformanceAnalyzer PA = new PerformanceAnalyzer();
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         planeWaveThread.init_params(getWidth(), getHeight(), 45);
         planeWaveThread.setRunning(true);
         planeWaveThread.start();
 
-        /*  synchronized (this) {
-            try {
-                Thread.currentThread().sleep(3000);
-            } catch (InterruptedException e) {
-
-            }
-        }
-        planeWaveThread2.init_params(getWidth(), getHeight(), 145);
-        planeWaveThread2.setRunning(true);
-        planeWaveThread2.start();*/
+        //Start performance analyzer
+        PA.startPA();
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        //     planeWaveThread.setSurfaceSize(width, height);
-        //      planeWaveThread2.setSurfaceSize(width, height);
     }
 
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         boolean retry = true;
         planeWaveThread.setRunning(false);
-        // planeWaveThread2.setRunning(false);
-
+        try {
+            planeWaveThread2.setRunning(false);
+        } catch (Exception e) {
+        }
         while (retry) {
             try {
                 planeWaveThread.join();
@@ -55,13 +48,14 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
             } catch (InterruptedException e) {
             }
         }
-        /*  while (retry) {
+        retry = true;
+        while (retry) {
             try {
                 planeWaveThread2.join();
                 retry = false;
             } catch (InterruptedException e) {
             }
-        }*/
+        }
 
 
     }
@@ -72,42 +66,31 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
 
-        // create thread only; it's started in surfaceCreated()
-        planeWaveThread = new PlaneWaveThread(holder, context, new Handler() {
+        planeWaveThread = new PlaneWaveThread(holder, context, "text", new Handler() {
             @Override
             public void handleMessage(Message m) {
+                mStatusText1.setText("Thread-1 Time-Performance Factor: " + m.getData().getString("text"));
             }
         });
 
-        planeWaveThread2 = new PlaneWaveThread(holder, context, new Handler() {
+        planeWaveThread2 = new PlaneWaveThread(holder, context, "text2", new Handler() {
             @Override
             public void handleMessage(Message m) {
+                mStatusText2.setText("Thread-2 Time-Performance Factor: " + m.getData().getString("text2"));
             }
         });
-
-        /*  planeWaveThread2 = new PlaneWaveThread(holder, context, new Handler() {
-            @Override
-            public void handleMessage(Message m) {
-            }
-        });*/
-
-
-        //    setFocusable(true); // make sure we get key events
     }
 
 
     class PlaneWaveThread extends Thread {
 
-        public static final int STATE_READY = 1;
-        public static final int STATE_RUNNING = 2;
-
-        private SurfaceHolder mSurfaceHolder;
+        private final SurfaceHolder mSurfaceHolder;
         private Bitmap image_background;
         private Bitmap image_overlay;
-        private Handler mHandler;
+        private final Handler mHandler;
+        private final String receiver;
 
-        private int height = 1;
-        private int width = 1;
+        private long currentPerformanceFactor = 0;
 
         private boolean mRun = false;
 
@@ -115,30 +98,20 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
         private int length = 12;
 
         public void init_params(int width, int height, int angle) {
-            this.width = width;
-            this.height = height;
             wave = new Wave(height, width, angle);
             Bitmap source_image = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sky);
 
             //Scaling Filter REDUCES INITIALIZATION TIME DRAMATICALLY!
-            //(when last parameter == true)
             //image_background = Bitmap.createScaledBitmap(source_image, width, height, false);
             image_background = Bitmap.createBitmap(source_image);
             image_overlay = Bitmap.createBitmap(image_background);
         }
 
-        public PlaneWaveThread(SurfaceHolder surfaceHolder, Context context, Handler handler) {
+        public PlaneWaveThread(SurfaceHolder surfaceHolder, Context context, String receiver, Handler handler) {
             mSurfaceHolder = surfaceHolder;
             mHandler = handler;
             mContext = context;
-            Resources res = context.getResources();
-        }
-
-        public void setSurfaceSize(int width, int height) {
-            synchronized (mSurfaceHolder) {
-                this.width = width;
-                this.height = height;
-            }
+            this.receiver = receiver;
         }
 
         @Override
@@ -150,13 +123,17 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
                     synchronized (mSurfaceHolder) {
                         try {
                             doDraw(c);
-                            Thread.currentThread().sleep(5);
-
+                            sleep(15);
+                            long start_time = System.currentTimeMillis();
                             wave.randomize_params();
                             wave.propagate();
                             image_overlay = Bitmap.createBitmap(image_background);
                             wave.stretch(image_background, image_overlay);
                             wave.setLength(length);
+                            long end_time = System.currentTimeMillis();
+
+                            currentPerformanceFactor = end_time - start_time;
+
                         } catch (Exception e) {
                         }
                     }
@@ -166,34 +143,13 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
                     }
                 }
             }
+            currentPerformanceFactor = 0;
         }
 
         private void doDraw(Canvas c) {
             c.drawBitmap(image_overlay, 0, 0, null);
         }
 
-        /* public void doStart() {
-            synchronized (mSurfaceHolder) {
-
-                while (true) {
-                    try {
-                        sleep(10);
-                        wave.randomize_params();
-                        wave.propagate();
-                        image_overlay = Bitmap.createBitmap(image_background);
-                        wave.stretch(image_background, image_overlay);
-                    } catch (InterruptedException e) {
-                    }
-
-                }
-
-
-            }
-        }*/
-
-        /**
-         * Pauses the physics update & animation.
-         */
 
         public void setRunning(boolean b) {
             mRun = b;
@@ -204,6 +160,41 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
             this.length = length;
         }
 
+        public synchronized long getCurrentPerformanceFactor() {
+            return currentPerformanceFactor;
+        }
+    }
+
+    public class PerformanceAnalyzer extends Thread {
+
+        public void startPA() {
+            this.start();
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    sleep(1000);
+                    sendMessage(getPlaneWaveThread().receiver,
+                            String.valueOf(getPlaneWaveThread().getCurrentPerformanceFactor()),
+                            getPlaneWaveThread().mHandler);
+                    sendMessage(getPlaneWaveThread2().receiver,
+                            String.valueOf(getPlaneWaveThread2().getCurrentPerformanceFactor()),
+                            getPlaneWaveThread2().mHandler);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void sendMessage(String receiver, String str, Handler h) {
+            Message msg = h.obtainMessage();
+            Bundle b = new Bundle();
+            b.putString(receiver, str);
+            msg.setData(b);
+            h.sendMessage(msg);
+        }
     }
 
 
@@ -215,15 +206,13 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
         return planeWaveThread2;
     }
 
-    public void setTextView(TextView textView) {
-        mStatusText = textView;
+    public void setTextView1(TextView textView) {
+        mStatusText1 = textView;
     }
 
-    public boolean isSecondWaveActive() {
-        return secondWaveActive;
+    public void setTextView2(TextView textView) {
+        mStatusText2 = textView;
     }
 
-    public void setSecondWaveActive(boolean secondWaveActive) {
-        this.secondWaveActive = secondWaveActive;
-    }
+
 }

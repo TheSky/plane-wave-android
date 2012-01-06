@@ -2,18 +2,13 @@ package com.thesky;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import com.thesky.PlaneWaveView.PlaneWaveThread;
 
 public class PlaneWave extends Activity {
 
-    private static String TAG = "plane-wave-android";
-
     private PlaneWaveView mPlaneWaveView;
-    private PlaneWaveThread mPlaneWaveThread;
 
     private static final int MENU_SMALL_WAVE = 1;
     private static final int MENU_LARGE_WAVE = 2;
@@ -23,55 +18,34 @@ public class PlaneWave extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate");
         setContentView(R.layout.main);
-
         mPlaneWaveView = (PlaneWaveView) findViewById(R.id.planewave);
-        mPlaneWaveThread = mPlaneWaveView.getPlaneWaveThread();
 
-        // give the LunarView a handle to the TextView used for messages
-        mPlaneWaveView.setTextView((TextView) findViewById(R.id.text));
-
-        /*  if (savedInstanceState == null) {
-        // we were just launched: set up a new wave
-        mPlaneWaveThread.setState(PlaneWaveThread.STATE_READY);
-        Log.w(this.getClass().getName(), "savedInstanceState is null");
-    } else {
-        // we are being restored: resume a previous game
-        mLunarThread.restoreState(savedInstanceState);
-        Log.w(this.getClass().getName(), "SIS is nonnull");
-    }    */
-
-
+        mPlaneWaveView.setTextView1((TextView) findViewById(R.id.text));
+        mPlaneWaveView.setTextView2((TextView) findViewById(R.id.text2));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_ONE_WAVE: {
-                //   mPlaneWaveView.setSecondWaveActive(false);
                 try {
-                    mPlaneWaveView.getPlaneWaveThread2().interrupt();
-                } catch (Exception e) {
-
+                    mPlaneWaveView.getPlaneWaveThread2().setRunning(false);
+                } catch (NullPointerException e) {
                 }
                 return true;
             }
             case MENU_TWO_WAVES: {
-                //  mPlaneWaveView.setSecondWaveActive(true);
                 try {
                     mPlaneWaveView.getPlaneWaveThread2().init_params(mPlaneWaveView.getWidth(), mPlaneWaveView.getHeight(), 150);
                     mPlaneWaveView.getPlaneWaveThread2().setRunning(true);
                     mPlaneWaveView.getPlaneWaveThread2().start();
-
-                } catch (Exception e) {
-
+                } catch (NullPointerException e) {
                 }
                 return true;
             }
             case MENU_SMALL_WAVE: {
                 mPlaneWaveView.getPlaneWaveThread().setWaveLength(12);
-
                 if (mPlaneWaveView.getPlaneWaveThread2() != null) {
                     mPlaneWaveView.getPlaneWaveThread2().setWaveLength(12);
                 }

@@ -4,12 +4,12 @@ import android.graphics.Bitmap;
 
 import java.util.Random;
 
-public class Wave {
+class Wave {
 
     //wave parameters
     private int length = 12;   // short wave by default
     private int length_new = 12;
-    private int speed = 20;
+    private int speed = 80;
     private int angle = 45;
     private double variance = 380;
     private int multiplication_factor = 10000;
@@ -17,14 +17,14 @@ public class Wave {
     private int x = 0;
     private int y = 0;
 
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
     private int[] elevations;
 
     private boolean first_start = true;
 
-    private static Random random = new Random(System.currentTimeMillis());
+    private static final Random random = new Random(System.currentTimeMillis());
 
     private boolean verify_pos() {
         return (x <= -width || y <= -height || x >= 2 * width || y >= 2 * height);
@@ -149,7 +149,6 @@ public class Wave {
                             break;
                         }
                     }
-
                 }
             }
 
@@ -181,13 +180,12 @@ public class Wave {
         //selection of proper algorithm depending on wave`s crest inclination angle
         int disp_x = (int) (Math.abs(Math.cos(Math.toRadians(90 - angle))) * 10000);
         int disp_y = (int) (Math.abs(Math.sin(Math.toRadians(90 - angle))) * 10000);
-
         if (disp_x < disp_y) {
             new WaveDeformationProcessor().vertical_process(image_original, image_to_draw);
         } else {
             new WaveDeformationProcessor().horizontal_process(image_original, image_to_draw);
         }
-
+        //realtime wave length setting
         length = length_new;
     }
 
