@@ -22,11 +22,15 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
     private volatile TextView mStatusText;
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        planeWaveThread.init_params(getWidth(), getHeight());
+        planeWaveThread.init_params(getWidth(), getHeight(), 45);
         planeWaveThread.setRunning(true);
         planeWaveThread.start();
+        try {
+            Thread.currentThread().sleep(3000);
+        } catch (InterruptedException e) {
 
-        planeWaveThread2.init_params(getWidth(), getHeight());
+        }
+        planeWaveThread2.init_params(getWidth(), getHeight(), 145);
         planeWaveThread2.setRunning(true);
         planeWaveThread2.start();
     }
@@ -100,10 +104,10 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
 
         private Wave wave;
 
-        public void init_params(int width, int height) {
+        public void init_params(int width, int height, int angle) {
             this.width = width;
             this.height = height;
-            wave = new Wave(height, width);
+            wave = new Wave(height, width, angle);
             Bitmap source_image = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sky);
             image_background = Bitmap.createScaledBitmap(source_image, width, height, true);
             image_overlay = Bitmap.createBitmap(image_background);
@@ -129,10 +133,11 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
                 Canvas c = null;
                 try {
                     c = mSurfaceHolder.lockCanvas();
+                    doDraw(c);
                     synchronized (mSurfaceHolder) {
-                        doDraw(c);
+
                         try {
-                            sleep(10);
+                            Thread.currentThread().sleep(100);
                             wave.randomize_params();
                             wave.propagate();
                             image_overlay = Bitmap.createBitmap(image_background);

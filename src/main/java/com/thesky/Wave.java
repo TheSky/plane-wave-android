@@ -92,9 +92,10 @@ public class Wave {
         y += speed * Math.sin(Math.toRadians(90 - angle));
     }
 
-    public Wave(int height, int width) {
+    public Wave(int height, int width, int angle) {
         this.height = height;
         this.width = width;
+        this.angle = angle;
         findElevations();
     }
 
