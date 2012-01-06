@@ -98,7 +98,7 @@ public class Wave {
         findElevations();
     }
 
-    public void stretch(Bitmap image_original, Bitmap image_to_draw) {
+    public synchronized void stretch(Bitmap image_original, Bitmap image_to_draw) {
 
         double displacement;
 

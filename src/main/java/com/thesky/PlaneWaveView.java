@@ -16,10 +16,10 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
 
     private PlaneWaveThread planeWaveThread;
     private PlaneWaveThread planeWaveThread2;
-    private Context mContext;
+    private volatile Context mContext;
 
 
-    private TextView mStatusText;
+    private volatile TextView mStatusText;
 
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         planeWaveThread.init_params(getWidth(), getHeight());
@@ -33,6 +33,7 @@ public class PlaneWaveView extends SurfaceView implements SurfaceHolder.Callback
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         planeWaveThread.setSurfaceSize(width, height);
+        planeWaveThread2.setSurfaceSize(width, height);
     }
 
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
